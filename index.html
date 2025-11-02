@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Fahri • Personal Universe — Cooper (Elegan)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Space+Grotesk:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070014;
+  --panel:#0b0620;
+  --card:#0f0722;
+  --accent:#a060ff;
+  --accent2:#79ecff;
+  --muted:#9aa6b6;
+  --glass: rgba(255,255,255,0.03);
+  --radius:12px;
+  --maxW:1200px;
+  --ui-z:60;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,'Space Grotesk',sans-serif;background:
+  radial-gradient(900px 420px at 12% 8%, #14002a 0%, rgba(7,4,18,1) 20%, #02020a 85%),var(--bg);
+  color:#eaf6ff;-webkit-font-smoothing:antialiased}
+a{color:var(--accent2)}
+.container{max-width:var(--maxW);margin:16px auto;padding:16px;display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start}
+header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:900;color:#011}
+h1{margin:0;font-size:18px}
+.lead{margin:0;color:var(--muted);font-size:13px}
+
+/* Left panel */
+.panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:var(--radius);box-shadow:0 14px 48px rgba(0,0,0,0.7)}
+.profile{display:flex;gap:12px;align-items:center}
+.avatar{width:76px;height:76px;border-radius:12px;background:linear-gradient(180deg,#230032,#08101a);display:grid;place-items:center;font-size:30px;font-weight:800}
+.meta small{display:block;color:var(--muted);margin-top:6px}
+.bio{margin-top:12px;color:#dff6ff;line-height:1.5}
+.skills{margin-top:12px;display:grid;grid-template-columns:1fr;gap:10px}
+.skill{background:var(--card);padding:10px;border-radius:10px}
+.skill .head{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px}
+.bar{height:10px;background:var(--glass);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:inherit;transition:width 900ms cubic-bezier(.2,.9,.3,1)}
+.left-buttons{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{background:transparent;border:1px solid rgba(255,255,255,0.05);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
+
+/* Stage (right) */
+.stage{position:relative;border-radius:14px;overflow:hidden;min-height:720px;box-shadow:0 18px 60px rgba(0,0,0,0.7)}
+canvas#glCanvas{width:100%;height:100%;display:block}
+canvas#overlay{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
+.ui-top{position:absolute;left:18px;top:18px;z-index:var(--ui-z);display:flex;gap:10px;align-items:center}
+.chip{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:999px;color:var(--muted);font-size:13px}
+.controls{position:absolute;left:18px;bottom:18px;z-index:var(--ui-z);background:linear-gradient(180deg, rgba(8,6,24,0.8), rgba(8,6,24,0.55));padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);display:flex;gap:8px}
+.controls .small{font-size:13px;color:var(--muted)}
+
+/* Cooper (collapsible) */
+.cooper-toggle{position:fixed;right:18px;bottom:18px;z-index:100;display:grid;place-items:center}
+.cooper-toggle button{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#001;font-size:18px;cursor:pointer;box-shadow:0 12px 40px rgba(146,86,255,0.12)}
+.cooper-panel{position:fixed;right:18px;bottom:86px;width:380px;background:linear-gradient(180deg, rgba(3,4,22,0.94), rgba(6,4,22,0.82));backdrop-filter: blur(8px);border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.04);z-index:99;transform-origin:100% 100%;transition:transform .28s cubic-bezier(.2,.9,.3,1),opacity .22s}
+.cooper-hide{transform:translateY(8px) scale(.98);opacity:0;pointer-events:none}
+.cooper-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--muted)}
+.coop-chat{height:260px;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.02)}
+.msg{margin-bottom:8px;padding:8px 10px;border-radius:10px;max-width:86%;line-height:1.38}
+.msg.user{margin-left:auto;background:linear-gradient(90deg, rgba(155,122,255,0.09), rgba(126,231,255,0.03));color:#071;box-shadow:0 6px 20px rgba(0,0,0,0.25)}
+.msg.ai{background:rgba(255,255,255,0.02);color:#eaf6ff}
+.typing{height:10px;width:44px;border-radius:6px;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));animation:blink 1s infinite}
+@keyframes blink{0%{opacity:0.3}50%{opacity:1}100%{opacity:0.3}}
+.coop-input{display:flex;gap:8px;margin-top:10px}
+.coop-input input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+.coop-input button{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;cursor:pointer}
+.hint{margin-top:8px;color:var(--muted);font-size:13px}
+
+/* fact popup */
+.fact-popup{position:fixed;left:50%;top:12%;transform:translateX(-50%);background:linear-gradient(180deg, rgba(10,6,30,0.95), rgba(6,4,18,0.9));padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);z-index:98;box-shadow:0 18px 60px rgba(0,0,0,0.6);display:none}
+.fact-popup.show{display:block;animation:pop .42s cubic-bezier(.2,.9,.3,1)}
+@keyframes pop{from{transform:translateX(-50%) translateY(-8px) scale(.98);opacity:0}to{transform:translateX(-50%) translateY(0) scale(1);opacity:1}}
+
+/* responsive */
+@media (max-width:980px){
+  .container{grid-template-columns:1fr;padding:12px}
+  .cooper-panel{left:12px;right:12px;bottom:18px;width:auto}
+  .cooper-toggle{right:12px;bottom:12px}
+  .stage{min-height:480px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="logo">F</div>
+      <div>
+        <h1>Fahri — Personal Universe</h1>
+        <p class="lead">SMKN 1 Rambah • Kls 11 • TKJ — 1% lebih baik tiap hari</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" id="showSkillsBtn">Show Skills</button>
+      <button class="btn" id="downloadCvBtn">Download CV</button>
+    </div>
+  </header>
+
+  <!-- LEFT -->
+  <aside class="panel" id="leftPanel">
+    <div class="profile">
+      <div class="avatar" id="avatar">F</div>
+      <div>
+        <div style="font-weight:800" id="name">Fahri</div>
+        <small id="role" class="small-muted">SMKN 1 Rambah — Kls 11, TKJ</small>
+        <small id="motto" class="small-muted">1% lebih baik dari kemarin</small>
+      </div>
+    </div>
+
+    <p class="bio" id="bio">Ringkas: Fahri — pelajar TKJ. Fokus: coding, server, jaringan. Halaman ringkas supaya elegan.</p>
+
+    <div class="skills" id="skills"></div>
+
+    <div class="left-buttons">
+      <button class="btn" id="portfolioBtn">Portofolio</button>
+      <button class="btn" id="contactBtn">Kontak</button>
+      <button class="btn" id="themeBtn">Theme</button>
+    </div>
+
+    <div style="margin-top:12px;color:var(--muted);font-size:13px">Tip: klik area black hole untuk spawn komet; sentuh bintang untuk funfact.</div>
+  </aside>
+
+  <!-- RIGHT -->
+  <main class="stage" id="stage">
+    <canvas id="glCanvas"></canvas>
+    <canvas id="overlay"></canvas>
+
+    <div class="ui-top">
+      <div class="chip">Black Hole — Realistik • Elegan</div>
+      <div class="chip" id="clockChip">--:--</div>
+    </div>
+
+    <div class="controls">
+      <div class="small">Actions</div>
+      <button class="btn" id="resetBtn">Reset</button>
+      <button class="btn" id="gravBtn">Toggle Gravity</button>
+      <button class="btn" id="cometBtn">Spawn Komet</button>
+      <button class="btn" id="rocketBtn">🚀 Rocket</button>
+    </div>
+  </main>
+</div>
+
+<!-- Cooper toggle & panel -->
+<div class="cooper-toggle">
+  <button id="coopToggleBtn" title="Buka/Tutup Cooper">Co</button>
+</div>
+
+<div class="cooper-panel cooper-hide" id="cooperPanel" role="dialog" aria-label="Cooper chat">
+  <div class="cooper-title">
+    <div style="font-weight:700;color:#eaf6ff">Cooper — Asisten</div>
+    <div style="font-size:13px;color:var(--muted)">Elegan • Futuristik</div>
+  </div>
+  <div class="coop-chat" id="coopChat" aria-live="polite"></div>
+  <form class="coop-input" id="coopForm">
+    <input id="coopInput" placeholder="Coba: 'help', 'siapa fahri', 'funfact', atau ngobrol bebas..." autocomplete="off" />
+    <button type="submit">Kirim</button>
+  </form>
+  <div class="hint">Perintah singkat: help • biodata • funfact • spawn comet • rocket • show skills • reset</div>
+</div>
+
+<!-- fact popup -->
+<div class="fact-popup" id="factPopup"></div>
+
+<!-- Three.js CDN -->
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+
+<script>
+/* ====================
+   Data & Helpers
+   ==================== */
+const USER = {
+  name: 'Fahri',
+  role: 'SMKN 1 Rambah — Kls 11, TKJ',
+  motto: '1% lebih baik dari kemarin',
+  skills: [
+    {n:'HTML/CSS', p:92}, {n:'JavaScript', p:82}, {n:'Linux/Server', p:84}, {n:'Networking', p:75}, {n:'Python', p:64}
+  ]
+};
+
+function $(id){ return document.getElementById(id); }
+
+/* inject basic info */
+$('name').textContent = USER.name;
+$('role').textContent = USER.role;
+$('motto').textContent = USER.motto;
+$('avatar').textContent = USER.name[0].toUpperCase();
+
+/* skills */
+const skillsWrap = $('skills');
+USER.skills.forEach(s=>{
+  const el = document.createElement('div'); el.className='skill';
+  el.innerHTML = `<div class="head"><span>${s.n}</span><span>${s.p}%</span></div><div class="bar"><i style="width:0"></i></div>`;
+  skillsWrap.appendChild(el);
+});
+function showSkills(){ document.querySelectorAll('.skill').forEach((el,i)=>{ setTimeout(()=> el.querySelector('i').style.width = USER.skills[i].p + '%', i*140); }); }
+
+/* download CV */
+$('showSkillsBtn').addEventListener('click', showSkills);
+$('downloadCvBtn').addEventListener('click', ()=> {
+  const txt = `Nama: ${USER.name}\nRole: ${USER.role}\nMotto: ${USER.motto}\n\nSkills:\n` + USER.skills.map(s=>`- ${s.n}: ${s.p}%`).join('\n');
+  const b = new Blob([txt],{type:'text/plain'}); const u = URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download = USER.name.replace(/\s+/g,'_')+'_CV.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(u);
+});
+
+/* clock */
+function updateClock(){ const d=new Date(); $('clockChip').textContent = d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+updateClock(); setInterval(updateClock, 60000);
+
+/* ====================
+   Three.js Black Hole Scene
+   ==================== */
+let renderer, scene, camera, clock;
+let particleSystem = null, positions=null, velocities=null;
+const PARTICLE_COUNT = 1700;
+let gravityOn = true;
+let mouse = {x:0,y:0,down:false};
+const canvas = $('glCanvas');
+const overlay = $('overlay'); let octx, OW, OH;
+function overlayResize(){ OW = overlay.width = overlay.clientWidth; OH = overlay.height = overlay.clientHeight; octx = overlay.getContext('2d'); }
+function overlayClear(){ if(octx) octx.clearRect(0,0,OW,OH); }
+
+/* Initialize Three */
+function initScene(){
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(50, canvas.clientWidth/canvas.clientHeight, 1, 10000);
+  camera.position.set(0,0,1200);
+  clock = new THREE.Clock();
+
+  // ambient
+  scene.add(new THREE.AmbientLight(0x99d6ff, 0.35));
+
+  // accretion rings (layered)
+  const ringGroup = new THREE.Group();
+  for(let i=0;i<10;i++){
+    const inner = 150 + i*18;
+    const outer = inner + 14;
+    const geo = new THREE.RingGeometry(inner, outer, 256);
+    const mat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setHSL(0.72 - i*0.02, 0.75, 0.45 - i*0.02),
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.10 + i*0.02,
+      blending: THREE.AdditiveBlending
+    });
+    const ring = new THREE.Mesh(geo, mat);
+    ring.rotation.x = Math.PI/2 * 0.92;
+    ring.rotation.z = i%2?0.16:-0.12;
+    ringGroup.add(ring);
+  }
+  scene.add(ringGroup);
+
+  // black core
+  const core = new THREE.Mesh(new THREE.SphereGeometry(140, 32, 16), new THREE.MeshBasicMaterial({color:0x000000}));
+  scene.add(core);
+
+  // halo sprite
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({map:makeRadial(512), color:0xffd9ff, transparent:true, opacity:0.14, blending:THREE.AdditiveBlending}));
+  halo.scale.set(900,900,1); scene.add(halo);
+
+  // particle cloud
+  positions = new Float32Array(PARTICLE_COUNT * 3);
+  velocities = new Float32Array(PARTICLE_COUNT * 3);
+  for(let i=0;i<PARTICLE_COUNT;i++){
+    const phi = Math.acos(2*Math.random()-1);
+    const theta = 2*Math.PI*Math.random();
+    const r = 700 + Math.random()*2600;
+    positions[i*3]   = Math.sin(phi)*Math.cos(theta)*r;
+    positions[i*3+1] = Math.sin(phi)*Math.sin(theta)*r*0.6;
+    positions[i*3+2] = Math.cos(phi)*r;
+    velocities[i*3]   = (Math.random()-0.5)*0.9;
+    velocities[i*3+1] = (Math.random()-0.5)*0.9;
+    velocities[i*3+2] = (Math.random()-0.5)*0.9;
+  }
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geom.setAttribute('vel', new THREE.BufferAttribute(velocities, 3));
+  const pMat = new THREE.PointsMaterial({size:2.6, color:0x9feaff, transparent:true, opacity:0.95});
+  particleSystem = new THREE.Points(geom, pMat);
+  scene.add(particleSystem);
+
+  // simple decorative planets
+  const planets = new THREE.Group();
+  for(let i=0;i<3;i++){
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(20 + i*6, 18, 12), new THREE.MeshPhongMaterial({color:new THREE.Color().setHSL(0.6 + i*0.04, 0.7, 0.45)}));
+    mesh.position.set(260 + i*120, Math.sin(i)*80, -60 - i*80);
+    planets.add(mesh);
+  }
+  scene.add(planets);
+
+  // lights
+  const pl = new THREE.PointLight(0xaaddff, 0.5); pl.position.set(1000,300,800); scene.add(pl);
+
+  // events
+  window.addEventListener('resize', onWindowResize);
+  canvas.addEventListener('mousemove', e=> {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+  });
+  canvas.addEventListener('mousedown', ()=> mouse.down = true);
+  canvas.addEventListener('mouseup', ()=> mouse.down = false);
+  canvas.addEventListener('click', (e)=> spawnCometsAt(e.clientX, e.clientY, 8));
+
+  overlayResize(); setupStars();
+
+  // start loop
+  (function loop(){
+    requestAnimationFrame(loop);
+    updateParticles();
+    applyCameraMovement();
+    if(particleSystem) particleSystem.geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+    drawOverlay();
+  })();
+
+  // ensure size okay
+  onWindowResize();
+}
+
+/* utilities */
+function makeRadial(size=256){
+  const c = document.createElement('canvas'); c.width=c.height=size; const ctx=c.getContext('2d');
+  const g = ctx.createRadialGradient(size/2,size/2,0,size/2,size/2,size/2);
+  g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.25,'rgba(255,210,250,0.6)'); g.addColorStop(1,'rgba(255,210,250,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,size,size);
+  return new THREE.CanvasTexture(c);
+}
+
+function onWindowResize(){
+  if(!renderer) renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w,h,false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  if(camera){ camera.aspect = w/h; camera.updateProjectionMatrix(); }
+  overlayResize();
+}
+
+/* particle physics */
+function updateParticles(){
+  if(!particleSystem) return;
+  const pos = particleSystem.geometry.attributes.position.array;
+  const vel = particleSystem.geometry.attributes.vel.array;
+  for(let i=0;i<PARTICLE_COUNT;i++){
+    const ix = i*3, iy = ix+1, iz = ix+2;
+    // current
+    let x = pos[ix], y = pos[iy], z = pos[iz];
+    const dx = -x, dy = -y, dz = -z;
+    const d2 = dx*dx + dy*dy + dz*dz + 0.0001;
+    if(gravityOn){
+      const f = Math.min(2600, 380000 / d2);
+      pos[ix] += vel[ix] * (0.35 + Math.random()*0.6) + dx * f * 0.000015;
+      pos[iy] += vel[iy] * (0.35 + Math.random()*0.6) + dy * f * 0.000015;
+      pos[iz] += vel[iz] * (0.35 + Math.random()*0.6) + dz * f * 0.000015;
+    } else {
+      pos[ix] += vel[ix];
+      pos[iy] += vel[iy];
+      pos[iz] += vel[iz];
+    }
+    // swirl
+    const ang = 0.0007 * (1000 / (Math.sqrt(d2)+1));
+    const cosA = Math.cos(ang), sinA = Math.sin(ang);
+    const rx = pos[ix]*cosA - pos[iy]*sinA;
+    const ry = pos[ix]*sinA + pos[iy]*cosA;
+    pos[ix]=rx; pos[iy]=ry;
+    vel[ix]*=0.997; vel[iy]*=0.997; vel[iz]*=0.997;
+    // respawn when swallowed
+    const dist = Math.sqrt(pos[ix]*pos[ix] + pos[iy]*pos[iy] + pos[iz]*pos[iz]);
+    if(dist < 130){
+      const r = 900 + Math.random()*2400;
+      const phi = Math.acos(2*Math.random()-1), theta = 2*Math.PI*Math.random();
+      pos[ix] = Math.sin(phi)*Math.cos(theta)*r;
+      pos[iy] = Math.sin(phi)*Math.sin(theta)*r*0.6;
+      pos[iz] = Math.cos(phi)*r;
+    }
+  }
+}
+
+/* camera follow slight */
+function applyCameraMovement(){
+  if(!camera) return;
+  if(mouse.x !== undefined){
+    const v = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera);
+    camera.position.x += (v.x*0.06 - camera.position.x) * 0.05;
+    camera.position.y += (v.y*0.06 - camera.position.y) * 0.05;
+    camera.lookAt(0,0,0);
+  }
+}
+
+/* spawn comets at screen pos */
+function spawnCometsAt(clientX, clientY, amount=10){
+  if(!particleSystem) return;
+  const rect = canvas.getBoundingClientRect();
+  const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+  const ny = -((clientY - rect.top) / rect.height) * 2 + 1;
+  const vec = new THREE.Vector3(nx, ny, 0.2).unproject(camera);
+  const pos = particleSystem.geometry.attributes.position.array;
+  for(let i=0;i<amount;i++){
+    const idx = Math.floor(Math.random()*PARTICLE_COUNT);
+    pos[idx*3] = vec.x + (Math.random()-0.5)*180;
+    pos[idx*3+1] = vec.y + (Math.random()-0.5)*180;
+    pos[idx*3+2] = vec.z + (Math.random()-0.5)*180;
+  }
+  particleSystem.geometry.attributes.position.needsUpdate = true;
+}
+
+/* spawn comets from center */
+function spawnCometsFromCenter(amount=60){
+  if(!particleSystem) return;
+  const pos = particleSystem.geometry.attributes.position.array;
+  for(let i=0;i<amount;i++){
+    const idx = Math.floor(Math.random()*PARTICLE_COUNT);
+    pos[idx*3] = (Math.random()-0.5)*700;
+    pos[idx*3+1] = (Math.random()-0.5)*700;
+    pos[idx*3+2] = 800 + Math.random()*700;
+  }
+  particleSystem.geometry.attributes.position.needsUpdate = true;
+}
+
+/* reset */
+function resetParticles(){
+  if(!particleSystem) return;
+  const pos = particleSystem.geometry.attributes.position.array;
+  for(let i=0;i<PARTICLE_COUNT;i++){
+    const r = 700 + Math.random()*2600;
+    const phi = Math.acos(2*Math.random()-1), theta = 2*Math.PI*Math.random();
+    pos[i*3] = Math.sin(phi)*Math.cos(theta)*r;
+    pos[i*3+1] = Math.sin(phi)*Math.sin(theta)*r*0.6;
+    pos[i*3+2] = Math.cos(phi)*r;
+  }
+  particleSystem.geometry.attributes.position.needsUpdate = true;
+}
+
+/* ====================
+   Overlay 2D: stars, clickable funfact, trails
+   ==================== */
+let stars = [], trails = [];
+function setupStars(){
+  overlayResize();
+  stars = [];
+  for(let i=0;i<200;i++){
+    stars.push({x:Math.random()*OW, y:Math.random()*OH, size: Math.random()*1.6+0.2, tw: Math.random()*6, clickable: Math.random()<0.035});
+  }
+  overlay.addEventListener('click', overlayClickHandler);
+}
+function overlayClickHandler(e){
+  const rect = overlay.getBoundingClientRect();
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  for(const s of stars){
+    const dx = s.x - x, dy = s.y - y;
+    if(s.clickable && Math.hypot(dx,dy) < 12){
+      showFact(randomFact());
+      for(let k=0;k<8;k++) spawnSpark(x,y);
+      return;
+    }
+  }
+}
+function drawOverlay(){
+  if(!octx) return;
+  octx.clearRect(0,0,OW,OH);
+  const g = octx.createLinearGradient(0,0,OW,OH);
+  g.addColorStop(0,'rgba(18,4,30,0.06)'); g.addColorStop(1,'rgba(6,6,18,0.04)');
+  octx.fillStyle = g; octx.fillRect(0,0,OW,OH);
+  // stars
+  for(const s of stars){
+    s.tw += 0.02 + Math.random()*0.03;
+    const a = 0.3 + 0.7*(0.5 + Math.sin(s.tw));
+    octx.globalAlpha = a;
+    octx.fillStyle = s.clickable ? '#ffd8ff' : '#dff6ff';
+    octx.fillRect(s.x, s.y, s.size, s.size);
+  }
+  octx.globalAlpha = 1;
+  // trails
+  for(let i=trails.length-1;i>=0;i--){
+    const t = trails[i];
+    t.x += t.vx; t.y += t.vy; t.life++;
+    const alpha = 1 - t.life / t.ttl;
+    octx.beginPath();
+    octx.arc(t.x, t.y, Math.max(0.6, 3*alpha), 0, Math.PI*2);
+    octx.fillStyle = `rgba(255,230,255,${alpha})`; octx.fill();
+    if(t.life > t.ttl) trails.splice(i,1);
+  }
+  // occasional spawn
+  if(Math.random() < 0.015 && trails.length < 8) spawnRandomTrail();
+}
+function spawnSpark(x,y){ trails.push({x,y,vx:(Math.random()-0.5)*6,vy:(Math.random()-0.5)*6,life:0,ttl:40}); }
+function spawnRandomTrail(){ trails.push({x:Math.random()*OW,y:Math.random()*OH,vx:4+Math.random()*6,vy:1+Math.random()*2,life:0,ttl:60}); }
+
+/* facts */
+const FACTS = [
+  'Lubang hitam membengkokkan ruang-waktu di sekitar mereka.',
+  'Cahaya juga terpengaruh gravitasi — fenomena ini disebut gravitational lensing.',
+  'Olympus Mons di Mars adalah gunung berapi terbesar di tata surya.',
+  'Galaksi kita (Bima Sakti) berisi ratusan miliar bintang.'
+];
+function randomFact(){ return FACTS[Math.floor(Math.random()*FACTS.length)]; }
+function showFact(text){
+  const el = $('factPopup');
+  el.textContent = text;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 3800);
+}
+
+/* ====================
+   UI wiring
+   ==================== */
+$('resetBtn').addEventListener('click', ()=> { resetParticles(); spawnRandomTrail(); });
+$('gravBtn').addEventListener('click', ()=> { gravityOn = !gravityOn; $('gravBtn').textContent = gravityOn ? 'Toggle Gravity' : 'Gravity Off'; });
+$('cometBtn').addEventListener('click', ()=> { spawnCometsFromCenter(40); for(let i=0;i<6;i++) spawnRandomTrail(); });
+$('rocketBtn').addEventListener('click', ()=> { rocketLaunch(); });
+
+$('portfolioBtn').addEventListener('click', ()=> alert('Portofolio: tambahkan link ke proyekmu.'));
+$('contactBtn').addEventListener('click', ()=> window.open('mailto:you@example.com'));
+
+/* rocket */
+function rocketLaunch(){
+  const el = document.createElement('div'); el.textContent='🚀'; el.style.position='absolute'; el.style.right='24px'; el.style.bottom='24px'; el.style.fontSize='36px'; el.style.zIndex=9999;
+  document.body.appendChild(el);
+  el.animate([{transform:'translateY(0)'},{transform:'translateY(-900px) scale(.6)'}], {duration:1500, easing:'cubic-bezier(.2,.8,.2,1)'});
+  setTimeout(()=>{ el.remove(); spawnCometsFromCenter(120); for(let i=0;i<12;i++) spawnRandomTrail(); }, 800);
+}
+
+/* ====================
+   Cooper: elegant-futuristic conversational assistant
+   ==================== */
+const coopToggle = $('coopToggleBtn'), coopPanel = $('cooperPanel'), coopForm = $('coopForm'), coopInput = $('coopInput'), coopChat = $('coopChat');
+let coopOpen = false;
+coopToggle.addEventListener('click', ()=> {
+  coopOpen = !coopOpen;
+  coopPanel.classList.toggle('cooper-hide', !coopOpen);
+  if(coopOpen) coopInput.focus();
+});
+
+const COOP_KEY = 'cooper_conv_v2';
+function saveMessage(text, who){ try{ const cur = JSON.parse(localStorage.getItem(COOP_KEY) || '[]'); cur.push({t:Date.now(), who, text}); localStorage.setItem(COOP_KEY, JSON.stringify(cur.slice(-120))); }catch(e){} }
+function loadConvo(){ try{ const arr = JSON.parse(localStorage.getItem(COOP_KEY) || '[]'); coopChat.innerHTML=''; arr.forEach(m=> { const d = document.createElement('div'); d.className='msg '+(m.who==='user'?'user':'ai'); d.textContent = m.text; coopChat.appendChild(d); }); coopChat.scrollTop = coopChat.scrollHeight; }catch(e){} }
+loadConvo();
+
+function appendCoop(text, who='ai', typing=false){
+  const d = document.createElement('div'); d.className = 'msg ' + (who==='user'?'user':'ai');
+  if(typing){ const t = document.createElement('div'); t.className='typing'; d.appendChild(t); } else { d.textContent = text; saveMessage(text, who); }
+  coopChat.appendChild(d); coopChat.scrollTop = coopChat.scrollHeight;
+  return d;
+}
+
+/* Cooper reply engine: elegant + dynamic */
+function cooperGenerateReply(input){
+  const t = input.trim().toLowerCase();
+  if(!t) return "Silakan ketik sesuatu — aku mendengarkan.";
+  // commands
+  if(t === 'help' || t === 'commands') return "Perintah: help, siapa fahri, biodata, funfact, quiz, spawn comet, rocket, show skills, reset, theme, kontak.";
+  if(t.includes('siapa fahri') || t.includes('siapa aku') || t.includes('nama')) return `Nama: ${USER.name}. ${USER.role}. Motto: ${USER.motto}.`;
+  if(t.includes('biodata')) return `${USER.name} — pelajar TKJ. Minat: coding, server, jaringan. Ringkas & rapi.`;
+  if(t.includes('funfact') || t.includes('fact')) return randomFact();
+  if(t.includes('quiz')) { const q = QUIZ[qidx]; return `Soal: ${q.q}\nPilihan: ${q.choices.map((c,i)=>`${i+1}. ${c}`).join(' • ')}\nBalas dengan angka jawaban.`; }
+  if(/^[1-4]$/.test(t)){ const v = parseInt(t,10)-1; const q = QUIZ[qidx]; qidx = (qidx+1)%QUIZ.length; if(v === q.a){ score+=10; return `Benar! ${q.fact} (+10). Skor: ${score}` } else { score = Math.max(0, score-2); return `Salah. ${q.fact} (-2). Skor: ${score}` } }
+  if(t.includes('spawn') && t.includes('comet')){ spawnCometsFromCenter(50); return 'Komet dimunculkan, lihat area.'; }
+  if(t.includes('rocket')){ rocketLaunch(); return 'Rocket diluncurkan — atmosfer menyesap suara.'; }
+  if(t.includes('show skills')){ showSkills(); return 'Menampilkan skill bar.'; }
+  if(t.includes('reset')){ resetParticles(); return 'Scene direset.'; }
+  if(t.includes('theme')){ $('themeBtn').click(); return 'Tema ditukar.'; }
+  if(t.includes('kontak') || t.includes('email')) return 'Email: you@example.com (edit di kode).';
+  // natural reply (elegant)
+  const replies = [
+    "Baik. Jelaskan sedikit lebih detail agar aku bantu konkret.",
+    "Terdengar menarik. Mau aku buat contoh kode atau langkah implementasi?",
+    "Intinya: mulai dari tujuan, alat, lalu implementasi. Mau contoh?",
+    "Aku siap bantu desain kerangka, penjelasan teknis, dan referensi singkat."
+  ];
+  if(input.trim().endsWith('?')) return replies[Math.floor(Math.random()*replies.length)];
+  if(input.length < 30) return replies[Math.floor(Math.random()*replies.length)];
+  return "Catat. Aku paham sebagian — jika mau rincian, jelaskan poinnya sedikit lagi.";
+}
+
+coopForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const v = coopInput.value.trim(); if(!v) return;
+  appendCoop(v, 'user'); coopInput.value = '';
+  const typ = appendCoop('', 'ai', true);
+  setTimeout(()=>{ typ.remove(); const r = cooperGenerateReply(v); appendCoop(r, 'ai'); }, 300 + Math.random()*800);
+});
+
+/* quiz dataset */
+const QUIZ = [
+  {q:'Apa itu lubang hitam?', choices:['Bintang meledak','Daerah gravitasi sangat kuat','Planet gelap','Awan debu'], a:1, fact:'Lubang hitam memiliki gravitasi sangat kuat sehingga cahaya tidak bisa lepas.'},
+  {q:'Planet yang disebut "Planet Merah"?', choices:['Venus','Mars','Jupiter','Merkurius'], a:1, fact:'Mars tampak merah karena oksida besi di permukaannya.'},
+  {q:'Nama galaksi kita?', choices:['Andromeda','Bima Sakti','Triangulum','Sombrero'], a:1, fact:'Galaksi kita disebut Bima Sakti (Milky Way).'}
+];
+let qidx = 0, score = 0;
+
+/* ====================
+   startup
+   ==================== */
+window.addEventListener('DOMContentLoaded', ()=>{
+  // init 3D (safely)
+  try{ initScene(); } catch(err){ console.error('3D init error', err); alert('Inisialisasi 3D gagal. Pastikan browser support WebGL dan koneksi untuk Three.js CDN.'); }
+  overlayResize(); setupStars();
+  showSkills();
+  appendCoop('Selamat datang — aku Cooper. Ketik "help" untuk daftar perintah.', 'ai');
+});
+
+/* ensure overlay resizes properly */
+window.addEventListener('resize', ()=>{ overlayResize(); });
+
+</script>
+</body>
+</html>
